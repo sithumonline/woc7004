@@ -3,12 +3,14 @@ services:
     build: ./services/web
     volumes:
       - ./services/web/:/usr/src/app/
+      - ./codecarbon:/usr/src/app/codecarbon
     ports:
       - "8080:5000"
     env_file:
       - ./.env
     depends_on:
       - db
+
   db:
     image: postgres:13-alpine
     volumes:
@@ -28,6 +30,20 @@ services:
   k6:
     image: grafana/k6:latest
     entrypoint: ["k6", "run", "/scripts/performance-test.js"]
+    volumes:
+      - ./k6:/scripts
+      - ./k6/results:/results
+
+  k6_db:
+    image: grafana/k6:latest
+    entrypoint: ["k6", "run", "/scripts/performance-db.js"]
+    volumes:
+      - ./k6:/scripts
+      - ./k6/results:/results
+
+  k6_redis:
+    image: grafana/k6:latest
+    entrypoint: ["k6", "run", "/scripts/performance-redis.js"]
     volumes:
       - ./k6:/scripts
       - ./k6/results:/results
