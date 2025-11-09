@@ -33,8 +33,8 @@ energy-db:
 	$(COMPOSE_CMD) run --rm k6_db
 
 energy-redis:
-	$(COMPOSE_CMD) exec -e K6_SERVICE=k6_redis web python codecarbon/k6_energy.py & \
 	$(COMPOSE_CMD) run --rm k6_redis
+	$(COMPOSE_CMD) exec -e K6_SERVICE=k6_redis web python codecarbon/k6_energy.py
 
 which-compose:
 	@echo Using compose runner: $(COMPOSE_CMD)

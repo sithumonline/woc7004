@@ -55,13 +55,6 @@ def parse_total_requests(summary: Path) -> int:
 
 def main():
     summary_path = pick_summary_path()
-    # Remove old file to avoid false positives
-    if summary_path.exists():
-        try:
-            summary_path.unlink()
-        except Exception:
-            pass
-
     tracker = EmissionsTracker(
         project_name="url-shortener",
         output_dir=str(RESULTS_DIR),
