@@ -14,6 +14,7 @@ from .auth import auth as auth_blueprint
 from .api import api as api_blueprint
 # Our models
 from .models import ShortLink, db, User, Visit
+from .carbon_tracker import init_app as init_carbon_tracker
 
 dictConfig({
     'version': 1,
@@ -55,6 +56,8 @@ random_letters = string.ascii_letters + string.digits
 app.register_blueprint(auth_blueprint)
 if os.environ.get("ENABLE_API", "False").lower() in ["true", "1", "t"]:
     app.register_blueprint(api_blueprint, url_prefix='/api')
+
+init_carbon_tracker(app)
 
 
 @login_manager.user_loader

@@ -8,6 +8,7 @@ DURATION_SECONDS = int(os.environ.get('BASELINE_DURATION', '60'))
 
 
 def main():
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     tracker = EmissionsTracker(
         project_name="url-shortener-baseline",
         output_dir=str(RESULTS_DIR),

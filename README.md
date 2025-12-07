@@ -88,6 +88,14 @@ Where it saves outputs (host paths):
 - `k6/results/energy_result_k6_db.json`
 - `k6/results/energy_result_k6_redis.json`
 
+Under the hood these targets call the Flask CLI commands `flask carbon start|stop`, which wrap CodeCarbon around the web service itself. You can inspect tracker status directly:
+
+```bash
+docker compose exec web flask carbon status
+```
+
+HTTP control is enabled by default so the tracker lives inside the long-running Gunicorn worker; you can opt out with `CODECARBON_HTTP_CONTROL=0`. When HTTP control is active you may also export a shared secret (e.g. `CODECARBON_CONTROL_TOKEN=supersecret`) before starting the stack to restrict access to the control endpoint.
+
 Quick per-request energy calculation (adjusted by baseline):
 
 ```python
@@ -107,6 +115,10 @@ def adjusted_wh_per_req(data):
 print("DB-only adjusted Wh/req:", adjusted_wh_per_req(db))
 print("Redis-only adjusted Wh/req:", adjusted_wh_per_req(redis))
 ```
+
+If you prefer the tracker to auto-start whenever the web service handles traffic, export `CODECARBON_ENABLED=true` (along with optional `CODECARBON_SCENARIO` and `CODECARBON_RESULTS_DIR`) before starting the containers.
+
+When HTTP control is enabled the Gunicorn entrypoint pins the app to a single worker so start/stop requests hit the same process. You can still override the measurement style with `CODECARBON_TRACKING_MODE` if you want to force machine/process estimates.
 
 Compose runner detection:
 

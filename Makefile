@@ -28,13 +28,21 @@ energy-baseline:
 	$(COMPOSE_CMD) exec web python codecarbon/baseline_energy.py
 
 energy-db:
-	# Run DB-only k6, then parse energy summary
+	# Run DB-only k6 with integrated CodeCarbon tracking
+	$(COMPOSE_CMD) exec web flask carbon start --scenario k6_db --force
 	$(COMPOSE_CMD) run --rm k6_db
-	$(COMPOSE_CMD) exec -e K6_SERVICE=k6_db web python codecarbon/k6_energy.py
+	$(COMPOSE_CMD) exec web flask carbon stop \
+		--summary-csv /usr/src/app/k6/results/db_only_summary.csv \
+		--write-json /usr/src/app/k6/results/energy_result_k6_db.json \
+		--reason loadtest-db
 
 energy-redis:
+	$(COMPOSE_CMD) exec web flask carbon start --scenario k6_redis --force
 	$(COMPOSE_CMD) run --rm k6_redis
-	$(COMPOSE_CMD) exec -e K6_SERVICE=k6_redis web python codecarbon/k6_energy.py
+	$(COMPOSE_CMD) exec web flask carbon stop \
+		--summary-csv /usr/src/app/k6/results/redis_only_summary.csv \
+		--write-json /usr/src/app/k6/results/energy_result_k6_redis.json \
+		--reason loadtest-redis
 
 energy-compare:
 	# Compare DB vs Redis with baseline and write a CSV + JSON summary
